@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group = 'space.provided'
+version = '1.0.0'
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.vadage:rs4j:1.0.0'
+}
