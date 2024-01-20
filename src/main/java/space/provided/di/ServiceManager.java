@@ -21,11 +21,26 @@ public final class ServiceManager implements ServiceLocator {
         services.put(ServiceManager.class, this);
     }
 
+    /**
+     * Register a service by an identifier using the default factory ({@link AutowireFactory}).
+     *
+     * @param identifier The class representing the identifier of the service to be registered.
+     * @return Instance of self
+     * @param <Service> The type parameter representing the service to be registered.
+     */
     public <Service> ServiceManager register(Class<Service> identifier) {
         factories.put(identifier, defaultFactory);
         return this;
     }
 
+    /**
+     * Register a service by an identifier using the instance of the specified factory.
+     *
+     * @param identifier The class representing the identifier of the service to be registered.
+     * @param factory The instance of the factory which has to create the service. Its generic type has to be assignable to {@code Service}
+     * @return Instance of self
+     * @param <Service> The type parameter representing the service to be registered.
+     */
     public <Service> ServiceManager register(Class<Service> identifier, FactoryInterface<Service> factory) {
         factories.put(identifier, factory);
         return this;

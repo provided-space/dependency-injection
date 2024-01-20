@@ -43,13 +43,13 @@ public final class AutowireFactory<Service> implements FactoryInterface<Service>
         }
     }
 
-    private Result<Object[], List<String>> resolveParameters(Class<?>[] parameters, ServiceLocator container) {
+    private Result<Object[], List<String>> resolveParameters(Class<?>[] parameters, ServiceLocator locator) {
         final Object[] arguments = new Object[parameters.length];
         final List<String> errors = new ArrayList<>();
 
         for (int i = 0; i < arguments.length; i++) {
             final int index = i;
-            container.get(parameters[index])
+            locator.get(parameters[index])
                     .andThenContinue(argument -> arguments[index] = argument)
                     .orElseContinue(errors::add);
         }
