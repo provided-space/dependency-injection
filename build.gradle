@@ -6,9 +6,9 @@ group = 'space.provided'
 version = '1.0.0'
 
 repositories {
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://registry.provided.space' }
 }
 
 dependencies {
-    implementation 'com.github.vadage:rs4j:1.0.0'
+    implementation 'space.provided:rs4j:1.0.0'
 }
