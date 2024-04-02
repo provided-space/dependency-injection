@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 group = 'space.provided'
-version = '1.0.1'
+version = '1.0.2'
 
 repositories {
     maven { url 'https://registry.provided.space' }
@@ -11,4 +12,22 @@ repositories {
 
 dependencies {
     implementation 'space.provided:rs4j:1.0.0'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url = 'https://registry.provided.space'
+            credentials {
+                username = System.getenv('REGISTRY_USERNAME')
+                password = System.getenv('REGISTRY_PASSWORD')
+            }
+        }
+    }
 }

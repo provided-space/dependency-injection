@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'space.provided:dependency-injection:TAG'
+    implementation 'space.provided:dependency-injection:VERSION'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
     <dependency>
         <groupId>space.provided</groupId>
         <artifactId>dependency-injection</artifactId>
-        <version>TAG</version>
+        <version>VERSION</version>
     </dependency>
 </dependencies>
 ```
