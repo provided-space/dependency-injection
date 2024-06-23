@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'space.provided:dependency-injection:VERSION'
+    implementation 'space.provided:dependency-injection:1.0.3'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
     <dependency>
         <groupId>space.provided</groupId>
         <artifactId>dependency-injection</artifactId>
-        <version>VERSION</version>
+        <version>1.0.3</version>
     </dependency>
 </dependencies>
 ```
@@ -74,7 +74,7 @@ public final class ConsoleLogger implements Logger {
 public final class LoggerFactory implements FactoryInterface<Logger> {
 
     @Override
-    public Result<Logger, String> create(Class<?> identifier, ServiceLocator locator) {
+    public Result<Logger, String> create(Class<? extends Logger> identifier, ServiceLocator locator) {
         return Result.ok(new ConsoleLogger());
     }
 }
@@ -82,11 +82,17 @@ public final class LoggerFactory implements FactoryInterface<Logger> {
 
 Configuring the `ServiceManager` can look something like this.
 ```java
- final ServiceManager services = new ServiceManager()
-         .register(Logger.class, new LoggerFactory()) // Register the Logger service using the instance of the specified LoggerFactory 
-         .register(Worker.class); // Register the Worker service using the default factory (AutowireFactory)
+final ServiceManager services = new ServiceManager()
+        .register(Worker.class); // Register the Worker service using the default factory (AutowireFactory)
 
- services.get(Worker.class)
-         .andThenContinue(Worker::dispatch)
-         .orElseContinue(error -> { /* handle error which happened during service creation */ });
+// Either register the Logger service using the instance of the specified LoggerFactory
+services.register(Logger.class, new LoggerFactory());
+
+// Or register an alias for the Logger interface which contains the implementation
+services.alias(Logger.class, ConsoleLogger.class)
+        .register(ConsoleLogger.class); // Pass a factory if required
+
+services.get(Worker.class)
+        .andThenContinue(Worker::dispatch)
+        .orElseContinue(error -> { /* handle error which happened during service creation */ });
 ```

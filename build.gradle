@@ -4,14 +4,18 @@ plugins {
 }
 
 group = 'space.provided'
-version = '1.0.2'
+version = '1.1.0'
+
+java {
+    withSourcesJar()
+}
 
 repositories {
     maven { url 'https://registry.provided.space' }
 }
 
 dependencies {
-    implementation 'space.provided:rs4j:1.0.0'
+    implementation 'space.provided:rs4j:1.0.1'
 }
 
 publishing {

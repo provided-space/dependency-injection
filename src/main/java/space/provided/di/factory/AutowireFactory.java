@@ -12,7 +12,7 @@ import java.util.List;
 public final class AutowireFactory<Service> implements FactoryInterface<Service> {
 
     @Override
-    public Result<Service, String> create(Class<?> identifier, ServiceLocator locator) {
+    public Result<? extends Service, String> create(Class<? extends Service> identifier, ServiceLocator locator) {
         final Option<Constructor<Service>> constructorOption = findConstructor(identifier);
         if (constructorOption.isNone()) {
             return Result.error(String.format("No matching constructor was found for %1$s.", identifier.getName()));

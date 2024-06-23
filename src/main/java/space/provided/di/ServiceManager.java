@@ -11,11 +11,13 @@ public final class ServiceManager implements ServiceLocator {
 
     private final Map<Class<?>, FactoryInterface<?>> factories;
     private final Map<Class<?>, Object> services;
+    private final Map<Class<?>, Class<?>> aliases;
     private final FactoryInterface<?> defaultFactory;
 
     public ServiceManager() {
         factories = new HashMap<>();
         services = new HashMap<>();
+        aliases = new HashMap<>();
         defaultFactory = new AutowireFactory<>();
 
         services.put(ServiceManager.class, this);
@@ -41,23 +43,40 @@ public final class ServiceManager implements ServiceLocator {
      * @return Instance of self
      * @param <Service> The type parameter representing the service to be registered.
      */
-    public <Service> ServiceManager register(Class<Service> identifier, FactoryInterface<Service> factory) {
+    public <Service> ServiceManager register(Class<Service> identifier, FactoryInterface<? extends Service> factory) {
         factories.put(identifier, factory);
         return this;
     }
 
+    /**
+     * Register an alias by an identifier which will then be mapped to the replacement.
+     *
+     * @param identifier The super class of the service.
+     * @param replacement A child class that inherits from the super class, which will then contain a more specific implementation.
+     * @return Instance of self
+     * @param <Service> The type parameter representing the service to be registered.
+     */
+    public <Service> ServiceManager alias(Class<Service> identifier, Class<? extends Service> replacement) {
+        aliases.put(identifier, replacement);
+        return this;
+    }
+
     @Override
-    public <Service> Result<Service, String> get(Class<Service> identifier) {
+    public <Service> Result<? extends Service, String> get(Class<Service> identifier) {
         if (services.containsKey(identifier)) {
             return Result.ok((Service) services.get(identifier));
         }
         return build(identifier).andThenContinue(service -> services.put(identifier, service));
     }
 
-    private <Service> Result<Service, String> build(Class<Service> identifier) {
-        if (!factories.containsKey(identifier)) {
-            return Result.error(String.format("No factory found for %1$s.", identifier.getName()));
+    private <Service> Result<? extends Service, String> build(Class<? extends Service> identifier) {
+        if (factories.containsKey(identifier)) {
+            final FactoryInterface<Service> factory = (FactoryInterface<Service>) factories.get(identifier);
+            return factory.create(identifier, this);
         }
-        return (Result<Service, String>) factories.get(identifier).create(identifier, this);
+        if (aliases.containsKey(identifier)) {
+            return (Result<Service, String>) get(aliases.get(identifier));
+        }
+        return Result.error(String.format("No factory found for %1$s.", identifier.getName()));
     }
 }

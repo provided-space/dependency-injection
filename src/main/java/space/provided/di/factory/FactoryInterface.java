@@ -21,5 +21,5 @@ public interface FactoryInterface<Service> {
      * @param locator The {@code ServiceLocator} used to locate and resolve dependencies required for service creation.
      * @return A {@code Result} containing either the successfully created service or an error message.
      */
-    Result<Service, String> create(Class<?> identifier, ServiceLocator locator);
+    Result<? extends Service, String> create(Class<? extends Service> identifier, ServiceLocator locator);
 }

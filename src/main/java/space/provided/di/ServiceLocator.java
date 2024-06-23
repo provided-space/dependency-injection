@@ -16,5 +16,5 @@ public interface ServiceLocator {
      * @return A {@code Result} containing either the successfully located service or an error message.
      * @param <Service> The type parameter representing the service to be located.
      */
-    <Service> Result<Service, String> get(Class<Service> identifier);
+    <Service> Result<? extends Service, String> get(Class<Service> identifier);
 }
