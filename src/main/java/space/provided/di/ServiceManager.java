@@ -21,6 +21,7 @@ public final class ServiceManager implements ServiceLocator {
         defaultFactory = new AutowireFactory<>();
 
         services.put(ServiceManager.class, this);
+        aliases.put(ServiceLocator.class, ServiceManager.class);
     }
 
     /**
@@ -66,16 +67,24 @@ public final class ServiceManager implements ServiceLocator {
         if (services.containsKey(identifier)) {
             return Result.ok((Service) services.get(identifier));
         }
-        return build(identifier).andThenContinue(service -> services.put(identifier, service));
+        return resolve(identifier, true).andThenContinue(service -> services.put(identifier, service));
     }
 
-    private <Service> Result<? extends Service, String> build(Class<? extends Service> identifier) {
+    @Override
+    public <Service> Result<? extends Service, String> build(Class<Service> identifier) {
+        return resolve(identifier, false);
+    }
+
+    private <Service> Result<? extends Service, String> resolve(Class<Service> identifier, boolean allowExisting) {
         if (factories.containsKey(identifier)) {
             final FactoryInterface<Service> factory = (FactoryInterface<Service>) factories.get(identifier);
             return factory.create(identifier, this);
         }
         if (aliases.containsKey(identifier)) {
-            return (Result<Service, String>) get(aliases.get(identifier));
+            if (allowExisting) {
+                return (Result<Service, String>) get(aliases.get(identifier));
+            }
+            return (Result<Service, String>) build(aliases.get(identifier));
         }
         return Result.error(String.format("No factory found for %1$s.", identifier.getName()));
     }

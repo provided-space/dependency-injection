@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'space.provided:dependency-injection:1.0.3'
+    implementation 'space.provided:dependency-injection:2.0.0'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
     <dependency>
         <groupId>space.provided</groupId>
         <artifactId>dependency-injection</artifactId>
-        <version>1.0.3</version>
+        <version>2.0.0</version>
     </dependency>
 </dependencies>
 ```
