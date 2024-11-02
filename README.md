@@ -3,44 +3,27 @@
 # Dependency injection
 
 - **Service Locator Pattern:** Utilize the `ServiceLocator` and `ServiceManager` classes to implement the Service Locator pattern, allowing for efficient and centralized management of services within your application.
-- **Dependency Injection:** Register your own factories using the `FactoryInterface` to create your services or simply use the default factory (`AutowireFactory`) if your service depends on solely other services which are resolvable using the Service Locator.
+- **Dependency Injection:** Register your own factories using the `FactoryInterface` to create your services or simply use the default factory (`AutowireFactory`) if your service depends on solely other services which are resolvable using the ServiceLocator.
+- **Optimized autowiring:** Annotate your services with ``@FactoryGenerated`` if they're applicable for autowiring. This leverages annotation processing to achieve slightly faster service resolving.
 
 ## Installation
 
-### Gradle
 ```groovy
 repositories {
     maven { url 'https://registry.provided.space' }
 }
 
 dependencies {
-    implementation 'space.provided:dependency-injection:2.0.0'
+    implementation 'space.provided:dependency-injection:2.0.1'
+    annotationProcessor 'space.provided:dependency-injection:2.0.1'
 }
-```
-
-### Maven
-```xml
-<repositories>
-    <repository>
-        <id>provided</id>
-        <name>provided.space</name>
-        <url>https://registry.provided.space</url>
-    </repository>
-</repositories>
-
-<dependencies>
-    <dependency>
-        <groupId>space.provided</groupId>
-        <artifactId>dependency-injection</artifactId>
-        <version>2.0.0</version>
-    </dependency>
-</dependencies>
 ```
 
 ## Example
 
 Given you have a Worker to handle tasks within your application and want to debug how long each execution took. The debug output can be stored anywhere.
 ```java
+@FactoryGenerated
 public final class Worker {
 
     private final Logger logger;
@@ -80,15 +63,22 @@ public final class LoggerFactory implements FactoryInterface<Logger> {
 }
 ```
 
-Configuring the `ServiceManager` can look something like this.
+Configuring the `ServiceManager` could look something like this.
 ```java
-final ServiceManager services = new ServiceManager()
-        .register(Worker.class); // Register the Worker service using the default factory (AutowireFactory)
+final ServiceManager services = new ServiceManager();
 
-// Either register the Logger service using the instance of the specified LoggerFactory
+// Autowiring
+// Option 1: Default factory which will run at runtime
+services.register(Worker.class);
+
+// Option 2: Generated factory which will run at compile time
+services.register(Worker.class, new WorkerFactory());
+
+// Working with abstractions
+// Option 1: Provide the factory instance yourself
 services.register(Logger.class, new LoggerFactory());
 
-// Or register an alias for the Logger interface which contains the implementation
+// Option 2: Setup an alias for the specific implementation
 services.alias(Logger.class, ConsoleLogger.class)
         .register(ConsoleLogger.class); // Pass a factory if required
 
